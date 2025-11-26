@@ -1,3 +1,6 @@
+from pathlib import Path
 import tinycwrap
 
-clib = tinycwrap.CModule(__file__/"clib/base.c", __file__/"clib/path.c")
+base_path = Path(__file__).parent/"clib"
+
+clib = tinycwrap.CModule(base_path/"base.c", base_path/"path.c")

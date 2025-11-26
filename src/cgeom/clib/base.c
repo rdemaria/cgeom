@@ -73,3 +73,49 @@ double geom2d_elliptic_E_complete(double k)
         return NAN;
     return geom2d_elliptic_E_numeric(0.5 * M_PI, k);
 }
+
+void merge_sorted(const double *restrict a, const double *restrict b, int len_a, int len_b, double *out, int *out_len)
+/* Return array with not repeated ascending values from a and b that are assumed to be sorted
+
+Contract: len_a=len(a); len_b=len(b); len(out)=len_a+len_b;
+Post-Contract: len(out)=out_len;
+*/
+{
+    int ia = 0, ib = 0, k = 0;
+    double last = NAN;
+    while (ia < len_a && ib < len_b) {
+        double va = a[ia];
+        double vb = b[ib];
+        double v;
+        if (va < vb) {
+            v = va;
+            ia++;
+        } else if (vb < va) {
+            v = vb;
+            ib++;
+        } else {
+            v = va;
+            ia++;
+            ib++;
+        }
+        if (k == 0 || v != last) {
+            out[k++] = v;
+            last = v;
+        }
+    }
+    while (ia < len_a) {
+        double v = a[ia++];
+        if (k == 0 || v != last) {
+            out[k++] = v;
+            last = v;
+        }
+    }
+    while (ib < len_b) {
+        double v = b[ib++];
+        if (k == 0 || v != last) {
+            out[k++] = v;
+            last = v;
+        }
+    }
+    *out_len = k;
+}

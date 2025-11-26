@@ -4,6 +4,46 @@ from .cwrapper import clib
 
 class Path2D(clib.G2DPath):
     @classmethod
+    def from_circle(cls, radius):
+        """Create a circular Path2D centered at the origin.
+
+        Parameters:
+            radius: Radius of the circle.
+
+        Returns:
+            Path2D: The created circular path.
+        """
+        segments=clib.geom2d_segments_from_circle(radius)
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @classmethod
+    def from_ellipse(cls, rx, ry):
+        """Create an elliptical Path2D centered at the origin.
+
+        Parameters:
+            rx: Radius along x-axis of the ellipse.
+            ry: Radius along y-axis of the ellipse.
+
+        Returns:
+            Path2D: The created elliptical path.
+        """
+        segments, _=clib.geom2d_segments_from_ellipse(rx, ry)
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @classmethod
+    def from_rectellipse(cls, halfwidth, halfheight, rx, ry):
+        """Create a rectangular-ellipse Path2D centered at the origin.
+
+        Parameters:
+            halfwidth: Half the width of the rectangle.
+            halfheight: Half the height of the rectangle.
+            rx: Radius along x-axis of the ellipse.
+            ry: Radius along y-axis of the ellipse.
+        """
+        segments, _=clib.geom2d_segments_from_rectellipse(halfwidth, halfheight, rx, ry)
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @classmethod
     def from_rectangle(cls, halfwidth, halfheight):
         """Create a rectangular Path2D centered at the origin.
 
@@ -17,45 +57,13 @@ class Path2D(clib.G2DPath):
         segments=clib.geom2d_segments_from_rectangle(halfwidth, halfheight)
         return cls(segments=segments, len_segments=len(segments))
     
-    @classmethod
-    def from_circle(cls, radius):
-        """Create a circular Path2D centered at the origin.
-
-        Parameters:
-            radius: Radius of the circle.
+    def get_corner_steps(self):
+        """Get the corner points of the path.
 
         Returns:
-            Path2D: The created circular path.
+            numpy.ndarray: Array of corner points.
         """
-        segments=clib.geom2d_segments_from_circle(radius)
-        return cls(segments=segments, len_segments=len(segments))
-    
-    @property
-    def length(self):
-        """Get the total length of the path."""
-        return clib.geom2d_path_get_length(self)
-    
-    def get_steps(self, ds_min):
-        """Get steps along the path with a minimum step size.
-
-        Parameters:
-            ds_min: Minimum step size.
-
-        Returns:
-            numpy.ndarray: Array of step positions along the path.
-        """
-        return clib.geom2d_path_get_steps(self, ds_min)
-
-    def get_points_at_steps(self, steps):
-        """Get points along the path at specified steps.
-
-        Parameters:
-            steps: Array of step positions along the path.
-
-        Returns:
-            numpy.ndarray: Array of points at the specified steps.
-        """
-        return clib.geom2d_path_get_points_at_steps(self, steps)
+        return clib.geom2d_path_get_corner_steps(self)
     
     def get_points(self, ds_min):
         """Get points along the path with a minimum step size.
@@ -69,6 +77,33 @@ class Path2D(clib.G2DPath):
         steps=clib.geom2d_path_get_steps(self, ds_min)
         return clib.geom2d_path_get_points_at_steps(self, steps)
 
+    def get_points_at_steps(self, steps):
+        """Get points along the path at specified steps.
+
+        Parameters:
+            steps: Array of step positions along the path.
+
+        Returns:
+            numpy.ndarray: Array of points at the specified steps.
+        """
+        return clib.geom2d_path_get_points_at_steps(self, steps)
+    
+    def get_steps(self, ds_min):
+        """Get steps along the path with a minimum step size.
+
+        Parameters:
+            ds_min: Minimum step size.
+
+        Returns:
+            numpy.ndarray: Array of step positions along the path.
+        """
+        return clib.geom2d_path_get_steps(self, ds_min)
+
+    @property
+    def length(self):
+        """Get the total length of the path."""
+        return clib.geom2d_path_get_length(self)
+    
 
     def plot(self, ax=None, ds_min=0.1, **kwargs):
         """Plot the path using Matplotlib.

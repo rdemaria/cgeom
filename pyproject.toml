@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cgeom"
+version = "0.1.0"
+description = "C geometry routines wrapped for Python via tinycwrap."
+readme = "readme.md"
+requires-python = ">=3.8"
+dependencies = [
+  "tinycwrap",
+]
+
+[project.optional-dependencies]
+examples = [
+  "numpy",
+  "matplotlib",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cgeom = ["clib/*.c", "clib/*.h"]

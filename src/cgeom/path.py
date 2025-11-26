@@ -1,0 +1,93 @@
+import matplotlib.pyplot as plt
+
+from .cwrapper import clib
+
+class Path2D(clib.G2DPath):
+    @classmethod
+    def from_rectangle(cls, halfwidth, halfheight):
+        """Create a rectangular Path2D centered at the origin.
+
+        Parameters:
+            halfwidth: Half the width of the rectangle.
+            halfheight: Half the height of the rectangle.
+
+        Returns:
+            Path2D: The created rectangular path.
+        """
+        segments=clib.geom2d_segments_from_rectangle(halfwidth, halfheight)
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @classmethod
+    def from_circle(cls, radius):
+        """Create a circular Path2D centered at the origin.
+
+        Parameters:
+            radius: Radius of the circle.
+
+        Returns:
+            Path2D: The created circular path.
+        """
+        segments=clib.geom2d_segments_from_circle(radius)
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @property
+    def length(self):
+        """Get the total length of the path."""
+        return clib.geom2d_path_get_length(self)
+    
+    def get_steps(self, ds_min):
+        """Get steps along the path with a minimum step size.
+
+        Parameters:
+            ds_min: Minimum step size.
+
+        Returns:
+            numpy.ndarray: Array of step positions along the path.
+        """
+        return clib.geom2d_path_get_steps(self, ds_min)
+
+    def get_points_at_steps(self, steps):
+        """Get points along the path at specified steps.
+
+        Parameters:
+            steps: Array of step positions along the path.
+
+        Returns:
+            numpy.ndarray: Array of points at the specified steps.
+        """
+        return clib.geom2d_path_get_points_at_steps(self, steps)
+    
+    def get_points(self, ds_min):
+        """Get points along the path with a minimum step size.
+
+        Parameters:
+            ds_min: Minimum step size.
+
+        Returns:
+            numpy.ndarray: Array of points along the path.
+        """
+        steps=clib.geom2d_path_get_steps(self, ds_min)
+        return clib.geom2d_path_get_points_at_steps(self, steps)
+
+
+    def plot(self, ax=None, ds_min=0.1, **kwargs):
+        """Plot the path using Matplotlib.
+
+        Parameters:
+            ax: Matplotlib Axes object. If None, uses the current axes.
+            **kwargs: Additional keyword arguments passed to the plot function.
+        """
+
+        if ax is None:
+            ax = plt.gca()
+            ax.set_aspect('equal')
+
+        steps=clib.geom2d_path_get_steps(self, ds_min)
+        points=clib.geom2d_path_get_points_at_steps(self, steps)
+        ax.plot(points['x'], points['y'], **kwargs)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        return self
+
+
+clib._struct_dtypes['G2DPath'] = Path2D

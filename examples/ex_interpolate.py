@@ -39,7 +39,7 @@ def best_shift_points(p_aa,p_bb):
 
 
 
-aa=cg.Path2D.from_rectellipse(1,1,1.2,1.2)
+aa=cg.Path2D.from_rectellipse(0.8,0.8,0.9,0.9)
 bb=cg.Path2D.from_circle(1.5)
 
 
@@ -82,34 +82,34 @@ plt.axis('equal')
 plt.show()
 
 # render in 3
-def plot_surface(x1,y1,x2,y2):
-    n=len(x1)
-    points = np.zeros((n*2, 3))
-    for i in range(n):
-        points[i, 0] = x1[i]
-        points[i, 1] = y1[i]
-        points[i, 2] = 0.0
-        points[n + i, 0] = x2[i]
-        points[n + i, 1] = y2[i]
-        points[n + i, 2] = 0.0
 
-    # Create the faces (quads)
-    faces = []
-    for i in range(n):
-        next_i = (i + 1) % n
-        faces.append([4, i, next_i, n + next_i, n + i])  # Quad face
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+x1=np.r_[x1, x1[0]]
+y1=np.r_[y1, y1[0]]
+x2=np.r_[x2, x2[0]]
+y2=np.r_[y2, y2[0]]
+ax.fill_between(x1, y1,0, x2,y2, z2=1, alpha=0.5)
+ax.plot(out[:,0],out[:,1], zs=0.5, zdir='z', label='interpolated', color='g')
 
-    # Convert faces to a flat array
-    faces_flat = np.hstack(faces)
+def intersect_line_plane(line,plane):
+    x1,y1,z1=line[0]
+    x2,y2,z2=line[1]
+    a,b,c,d=plane[0]
+    t=(d - a*x1 - b*y1 - c*z1)/(a*(x2 - x1) + b*(y2 - y1) + c*(z2 - z1))
+    x=x1 + t*(x2 - x1)
+    y=y1 + t*(y2 - y1)
+    z=z1 + t*(z2 - z1)
+    return (x,y,z)
 
-    # Create the PolyData object
-    mesh = pv.PolyData(points, faces_flat)
+out=[]
+for xx1,xx2,yy1,yy2 in zip(x1,x2,y1,y2):
+    p1=(xx1,yy1,0)
+    p2=(xx2,yy2,1)
+    line=(p1,p2)
+    plane=((0,0.3,1,0.5),)
+    p_int=intersect_line_plane(line,plane)
+    out.append(p_int)
 
-    # Plot the surface
-    plotter = pv.Plotter()
-    plotter.add_mesh(mesh, color='lightblue', show_edges=True, opacity=0.7)
-    plotter.show()
-
-plot_surface(p_aa['x'],p_aa['y'],p_bb_aligned['x'],p_bb_aligned['y'])
-
-
+out=np.array(out)
+ax.plot(out[:,0],out[:,1],out[:,2], zdir='z', label='interpolated', color='r')

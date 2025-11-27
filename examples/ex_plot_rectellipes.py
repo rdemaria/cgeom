@@ -25,11 +25,13 @@ for ax,arg in zip(axes.flatten(),args):
     ax.text(0.5, 0.15, f"{p.len_segments} segments", ha='center', va='top', transform=ax.transAxes)
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
     ax.set_xlim(-2,2)
     ax.set_ylim(-2,2)
 
 
-plt.tight_layout()
+#plt.tight_layout()
 
 
 #cg.Path2D.from_rectellipse(1.2,0.9,rr,rr).plot()

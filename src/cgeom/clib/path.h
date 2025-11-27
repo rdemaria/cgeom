@@ -11,6 +11,13 @@ data:
  ellipse arc: cx,cy,rx,ry,rotation,start_angle,end_angle
  quadratic bezier: x1,y1,x2,y2,cx,cy
  cubic bezier: x1,y1,x2,y2,cx1,cy1,cx2,cy2
+
+ISSUES:
+ - no bezier segments yet
+ - no splines yet
+ - path assumed to be continuous but not enforced by the structure
+
+
 */
 
 #define CGEOM_LINE_SEGMENT_TYPE 0

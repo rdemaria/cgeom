@@ -446,74 +446,36 @@ Post-contract: len(out_segments)=out_len
     double iy = ry * sin(angle1);
     double ix = rx * cos(angle2);
 
-    if (rx == ry)
-    { // printf("circle case\n");
-        if (arg1 < 1 && arg2 < 1)
-        { // printf("8 segments\n");
-            geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, angle1, angle2, &out_segments[1]);
-            geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[2]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, ry, M_PI / 2 + angle1, M_PI / 2 + angle2, &out_segments[3]);
-            geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[4]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, M_PI + angle1, M_PI + angle2, &out_segments[5]);
-            geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[6]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, 3 * M_PI / 2 + angle1, 3 * M_PI / 2 + angle2, &out_segments[7]);
-            *out_len = 8;
-            return;
-        }
-        if (arg1 < 1)
-        { // printf("flat sides\n");
-            geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, angle1, M_PI - angle1, &out_segments[1]);
-            geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[2]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, M_PI + angle1, 2 * M_PI - angle1, &out_segments[3]);
-            *out_len = 4;
-            return;
-        }
-        if (arg2 < 1)
-        { // printf("flat top/bottom\n");
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, -angle2, angle2, &out_segments[0]);
-            geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[1]);
-            geom2d_arc_segment_from_center_radius_angles(0.0, 0.0, rx, M_PI - angle2, M_PI + angle2, &out_segments[2]);
-            geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[3]);
-            *out_len = 4;
-            return;
-        }
+    if (arg1 < 1 && arg2 < 1)
+    { // printf("8 segments\n");
+        geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, 0.0, angle1, angle2, &out_segments[1]);
+        geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[2]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, M_PI / 2 + angle1, M_PI / 2 + angle2, &out_segments[3]);
+        geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[4]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, M_PI + angle1, M_PI + angle2, &out_segments[5]);
+        geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[6]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, 3 * M_PI / 2 + angle1, 3 * M_PI / 2 + angle2, &out_segments[7]);
+        *out_len = 8;
+        return;
     }
-    else
-    { // ellipse case
-
-        if (arg1 < 1 && arg2 < 1)
-        { /* 8 segments */
-            geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, angle1, angle2, &out_segments[1]);
-            geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[2]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, M_PI / 2 + angle1, M_PI / 2 + angle2, &out_segments[3]);
-            geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[4]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, M_PI + angle1, M_PI + angle2, &out_segments[5]);
-            geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[6]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, 3 * M_PI / 2 + angle1, 3 * M_PI / 2 + angle2, &out_segments[7]);
-            *out_len = 8;
-            return;
-        }
-        if (angle1 < 1)
-        { /*  arc top and bottom */
-            geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, angle1, M_PI - angle1, &out_segments[1]);
-            geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[2]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, M_PI + angle1, 2 * M_PI - angle1, &out_segments[3]);
-            *out_len = 4;
-            return;
-        }
-        if (angle2 < 1)
-        { /* arc right and left */
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, -angle2, angle2, &out_segments[0]);
-            geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[1]);
-            geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(0.0, 0.0, rx, ry, 0.0, M_PI - angle2, M_PI + angle2, &out_segments[2]);
-            geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[3]);
-            *out_len = 4;
-            return;
-        }
+    if (arg1 < 1)
+    { // printf("flat sides\n");
+        geom2d_line_segment_from_start_end(halfwidth, -iy, halfwidth, iy, &out_segments[0]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, angle1, M_PI - angle1, &out_segments[1]);
+        geom2d_line_segment_from_start_end(-halfwidth, iy, -halfwidth, -iy, &out_segments[2]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, M_PI + angle1, 2 * M_PI - angle1, &out_segments[3]);
+        *out_len = 4;
+        return;
+    }
+    if (arg2 < 1)
+    { // printf("flat top/bottom\n");
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, -angle2, angle2, &out_segments[0]);
+        geom2d_line_segment_from_start_end(ix, halfheight, -ix, halfheight, &out_segments[1]);
+        geom2d_maybe_ellipse_segment_from_center_radius_angles(0.0, 0.0, rx, ry, M_PI - angle2, M_PI + angle2, &out_segments[2]);
+        geom2d_line_segment_from_start_end(-ix, -halfheight, ix, -halfheight, &out_segments[3]);
+        *out_len = 4;
+        return;
     }
 }
 

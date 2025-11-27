@@ -28,7 +28,7 @@ class Path2D(clib.G2DPath):
         Returns:
             Path2D: The created elliptical path.
         """
-        segments, _ = clib.geom2d_segments_from_ellipse(rx, ry)
+        segments= clib.geom2d_segments_from_ellipse(rx, ry)
         return cls(segments=segments, len_segments=len(segments))
 
     @classmethod
@@ -76,6 +76,23 @@ class Path2D(clib.G2DPath):
         segments, _ = clib.geom2d_segments_from_racetrack(
             halfhside, halfvside, rx, ry
         )
+        return cls(segments=segments, len_segments=len(segments))
+    
+    @classmethod
+    def from_octagon(cls, halfwidth, halfheight, halfdgap):
+        """Create an octagonal Path2D centered at the origin.
+
+        Parameters:
+            halfwidth: Half the width of the octagon.
+            halfheight: Half the height of the octagon.
+            halfdgap: Half the gap along 45-degree edges.
+
+        Returns:
+            Path2D: The created octagonal path.
+        """
+        segments, ret = clib.geom2d_segments_from_octagon(halfwidth, halfheight, halfdgap)
+        if ret == 0:
+            raise ValueError("Invalid parameters for octagon")
         return cls(segments=segments, len_segments=len(segments))
 
     def get_corner_steps(self):

@@ -65,6 +65,7 @@ void geom2d_segments_from_circle(double radius, G2DSegment *out_segments);
 void geom2d_segments_from_ellipse(double rx, double ry, G2DSegment *out_segments);
 void geom2d_segments_from_rectellipse(double halfwidth, double halfheight, double rx, double ry, G2DSegment *out_segments, int *len_segments);
 void geom2d_segments_from_racetrack(double halfhside, double halfvside, double rx, double ry, G2DSegment *out_segments, int *out_len);
+void geom2d_segments_from_octagon(double halfwidth, double halfheight, double halfdgap, G2DSegment *out_segments, int *out_len);
 
 /* Path functions */
 int geom2d_path_get_len_steps(const G2DPath *path, double ds_min);

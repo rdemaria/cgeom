@@ -3,8 +3,8 @@ import cgeom as cg
 import matplotlib.pyplot as plt
 
 
-el=cg.Path2D.from_ellipse(1.2,0.9)
-el.length
-el.plot()
+el=cg.Path2D.from_octagon(1,1,1).plot()
+el=cg.Path2D.from_octagon(1,1,1.4).plot()
+el=cg.Path2D.from_octagon(1,1,0.71).plot()
 
 

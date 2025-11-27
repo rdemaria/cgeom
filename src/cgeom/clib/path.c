@@ -14,6 +14,20 @@ geom2d_<objec>_<operation>....
 
 */
 
+/* ===== Line segment functions ===== */
+
+void geom2d_line_segment_from_start_end(double x0, double y0, double x1, double y1, G2DSegment *out)
+/* Get line data from starting and ending points
+
+*/
+{
+    out->data[0] = x0;
+    out->data[1] = y0;
+    out->data[2] = x1;
+    out->data[3] = y1;
+    out->type = 0; /* line */
+}
+
 void geom2d_line_segment_from_start_length(double x0, double y0, double dx, double dy, double length, G2DSegment *out)
 /* Get line data from starting point, direction (assuming dx,dy have norm=1) and length
 
@@ -25,18 +39,6 @@ void geom2d_line_segment_from_start_length(double x0, double y0, double dx, doub
     out->data[1] = y0;
     out->data[2] = x0 + ux * length;
     out->data[3] = y0 + uy * length;
-    out->type = 0; /* line */
-}
-
-void geom2d_line_segment_from_start_end(double x0, double y0, double x1, double y1, G2DSegment *out)
-/* Get line data from starting and ending points
-
-*/
-{
-    out->data[0] = x0;
-    out->data[1] = y0;
-    out->data[2] = x1;
-    out->data[3] = y1;
     out->type = 0; /* line */
 }
 
@@ -72,7 +74,14 @@ Contract: len_points=len(steps); len(out_points)=len_points
     }
 }
 
+/* ===== End line segment functions ===== */
+
+/* ===== Arc segment functions ===== */
+
 void geom2d_arc_segment_from_center_radius_angles(double cx, double cy, double r, double start_angle, double end_angle, G2DSegment *out)
+/* Get arc data from center, radius and start/end angles
+
+*/
 {
     out->data[0] = cx;
     out->data[1] = cy;
@@ -158,6 +167,11 @@ Contract: len_points=len(steps); len(out_points)=len_points
         out_points[i].y = cy + r * sin(angle_at);
     }
 }
+
+/* ===== End arc segment functions ===== */
+
+/* ===== Ellipse arc segment functions ===== */
+
 void geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(double cx, double cy, double rx, double ry, double rotation, double start_angle, double end_angle, G2DSegment *out)
 {
     out->data[0] = cx;
@@ -168,6 +182,17 @@ void geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(double cx, dou
     out->data[5] = start_angle;
     out->data[6] = end_angle;
     out->type = CGEOM_ELLIPSE_ARC_SEGMENT_TYPE;
+}
+
+void geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(double cx, double cy, double rx, double ry, double rotation, double start_angle, double end_angle, G2DSegment *out)
+{
+    if (rx == ry)
+    {
+        double r = rx;
+        geom2d_arc_segment_from_center_radius_angles(cx, cy, r, start_angle, end_angle, out);
+        return;
+    }
+    geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(cx, cy, rx, ry, rotation, start_angle, end_angle, out);
 }
 
 static double geom2d_ellipse_cumulative_length(double angle, double rx, double ry)
@@ -268,6 +293,66 @@ Contract: len(steps)=len_points; len(out_points)=len_points
     }
 }
 
+/* ===== End ellipse arc segment functions ===== */
+
+/* ===== Racetrack segment functions ===== */
+void geom2d_segments_from_racetrack(double halfwidth, double halfheight, double rx, double ry, G2DSegment *out_segments, int *out_len)
+/* Create a path for a racetrack shape centered at (0,0)
+
+Contract: len(out_segments)=8
+Post-Contract: len(out_segments)=out_len
+*/
+{
+    *out_len = 0;
+    // Straight right
+    if (halfheight > 0){
+        geom2d_line_segment_from_start_end(halfwidth, -halfheight+ry, halfwidth, halfheight-ry, &out_segments[0]);
+        (*out_len)++;
+    }
+    if (rx>0 && ry>0){
+         // Top-right arc
+         geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(halfwidth-rx, halfheight-ry, rx, ry, 0.0, 0, M_PI/2, &out_segments[*out_len]);
+         (*out_len)++;
+    }
+    if (halfwidth > 0){
+        // Straight top
+        geom2d_line_segment_from_start_end(halfwidth - rx, halfheight , -halfwidth + rx, halfheight, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+    if (rx>0 && ry>0){
+        // Top-left arc
+        geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(-halfwidth+rx, halfheight-ry, rx, ry, 0.0, M_PI/2, M_PI, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+    if (halfheight > 0){
+        // Straight left
+        geom2d_line_segment_from_start_end(-halfwidth, halfheight - ry, -halfwidth, -halfheight + ry, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+    if (rx>0 && ry>0){
+        // Bottom-left arc
+        geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(-halfwidth+rx, -halfheight+ry, rx, ry, 0.0, M_PI, 3.0*M_PI/2.0, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+    if (halfheight > 0){
+        // Straight bottom
+        geom2d_line_segment_from_start_end(-halfwidth + rx, -halfheight, halfwidth - rx, -halfheight, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+    if (rx>0 && ry>0){
+        // Bottom-right arc
+        geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(halfwidth-rx, -halfheight+ry, rx, ry, 0.0, 3.0*M_PI/2.0, 2.0*M_PI, &out_segments[*out_len]);
+        (*out_len)++;
+    }
+}
+
+
+
+/* ===== End racetrack segment functions ===== */
+
+
+/* ===== Segment functions ===== */
+
 double geom2d_segment_get_length(const G2DSegment *seg)
 /* Get length of a segment */
 {
@@ -283,6 +368,10 @@ double geom2d_segment_get_length(const G2DSegment *seg)
         return 0.0;
     }
 }
+
+/* ===== End segment functions ===== */
+
+/* ===== Segments from shapes ===== */
 
 void geom2d_segments_from_rectangle(double halfwidth, double halfheight, G2DSegment *out_segments)
 /* Create a path for a rectangle centered at (0,0)
@@ -328,7 +417,7 @@ Post-contract: len(out_segments)=out_len
 {
     double arg1 = halfwidth / rx;
     double arg2 = halfheight / ry;
-
+ 
     if (arg1 > 1.0)
         arg1 = 1.0;
     if (arg2 > 1.0)
@@ -427,6 +516,10 @@ Post-contract: len(out_segments)=out_len
         }
     }
 }
+
+/* ===== End segments from shapes ===== */
+
+/* ===== Path functions ===== */
 
 int geom2d_path_get_len_steps(const G2DPath *path, double ds_min)
 {
@@ -654,3 +747,5 @@ void geom2d_path_get_corner_steps(const G2DPath *path, double *out_steps)
         out_steps[i + 1] = length_acc;
     }
 }
+
+/* ===== End path functions ===== */

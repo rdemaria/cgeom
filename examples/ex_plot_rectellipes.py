@@ -1,5 +1,5 @@
 import cgeom as cg
-from cgeom import clib
+#from cgeom import clib
 import matplotlib.pyplot as plt
 
 

@@ -45,6 +45,7 @@ void geom2d_arc_segment_get_points_at_steps(const G2DSegment *seg, const double 
 
 /* Ellipse arc segment functions */
 void geom2d_ellipse_arc_segment_from_center_radii_rotation_angles(double cx, double cy, double rx, double ry, double rotation, double start_angle, double end_angle, G2DSegment *out);
+void geom2d_maybe_ellipse_arc_segment_from_center_radii_rotation_angles(double cx, double cy, double rx, double ry, double rotation, double start_angle, double end_angle, G2DSegment *out);
 double geom2d_ellipse_segment_get_length(const G2DSegment *seg);
 void geom2d_ellipse_segment_get_points_at_steps(const G2DSegment *seg, const double *steps, int len_points, G2DPoint *out_points);
 
@@ -56,6 +57,7 @@ void geom2d_segments_from_rectangle(double halfwidth, double halfheight, G2DSegm
 void geom2d_segments_from_circle(double radius, G2DSegment *out_segments);
 void geom2d_segments_from_ellipse(double rx, double ry, G2DSegment *out_segments);
 void geom2d_segments_from_rectellipse(double halfwidth, double halfheight, double rx, double ry, G2DSegment *out_segments, int *len_segments);
+void geom2d_segments_from_racetrack(double halfhside, double halfvside, double rx, double ry, G2DSegment *out_segments, int *out_len);
 
 /* Path functions */
 int geom2d_path_get_len_steps(const G2DPath *path, double ds_min);

@@ -17,6 +17,12 @@ typedef struct {
     double z;
 } G3DPoint;
 
+typedef struct {
+    double mat[4*4];
+} G3DTransform;
+
+
+
 double geom2d_norm(double x, double y);
 double geom2d_points_distance(double x1, double y1, double x2, double y2);
 double geom2d_elliptic_E(double phi, double k);

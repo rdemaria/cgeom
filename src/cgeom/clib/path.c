@@ -305,8 +305,7 @@ Contract: len(steps)=len_points; len(out_points)=len_points
 void geom2d_segments_from_racetrack(double halfwidth, double halfheight, double rx, double ry, G2DSegment *out_segments, int *out_len)
 /* Create a path for a racetrack shape centered at (0,0)
 
-Contract: len(out_segments)=8
-Post-Contract: len(out_segments)=out_len
+Contract: len(out_segments)=8; postlen(out_segments)=out_len
 */
 {
     if (rx <= 0.0 || ry <= 0.0)
@@ -363,8 +362,7 @@ Post-Contract: len(out_segments)=out_len
 void geom2d_segments_from_octagon(double halfwidth, double halfheight, double halfdgap, G2DSegment *out_segments, int *out_len)
 /* Create an octagon defined by halfwidth, halfheight, and half 45 degrees gap 
 
-Contract: len(out_segments)=8
-Post-Contract: len(out_segments)=out_len
+Contract: len(out_segments)=8; postlen(out_segments)=out_len
 */
 {
     // Intersect of a line at 45 degrees with a minimum distance halfdgap from the cernter with the rectangle
@@ -451,8 +449,7 @@ Contract: len(out_segments)=1
 void geom2d_segments_from_rectellipse(double halfwidth, double halfheight, double rx, double ry, G2DSegment *out_segments, int *out_len)
 /* Create a path for the intersection between a rectangle and an ellipse
 
-Contract: len(out_segments)=8
-Post-contract: len(out_segments)=out_len
+Contract: len(out_segments)=8; postlen(out_segments)=out_len
 */
 {
     double arg1 = halfwidth / rx;

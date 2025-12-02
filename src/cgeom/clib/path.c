@@ -747,4 +747,17 @@ void geom2d_path_get_corner_steps(const G2DPath *path, double *out_steps)
     }
 }
 
+void geom2d_path_get_n_uniform_points(const G2DPath *path, int n_points, G2DPoint *out_points)
+{
+double total_length = geom2d_path_get_length(path);
+    double ds = total_length / (n_points - 1);
+    double *steps = (double *)malloc(n_points * sizeof(double));
+    for (int i = 0; i < n_points; i++)
+    {
+        steps[i] = i * ds;
+    }
+    geom2d_path_get_points_at_steps(path, steps, n_points, out_points);
+    free(steps);
+}
+
 /* ===== End path functions ===== */

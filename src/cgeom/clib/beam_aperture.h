@@ -4,7 +4,7 @@
 #ifndef CGEOM_BEAM_APERTURE_H
 #define CGEOM_BEAM_APERTURE_H
 
-typedef struct beam_data
+typedef struct twiss_data
 {
     double x;                 // closed orbit x
     double y;                 // closed orbit y
@@ -13,10 +13,14 @@ typedef struct beam_data
     double dx;                // dispersion x
     double dy;                // dispersion y
     double delta;             // relative energy deviation
+    double gamma;             // relativistic gamma
+} G2DTwissData;
+
+typedef struct beam_data
+{
     double emitx_norm;        // normalized emittance x
     double emity_norm;        // normalized emittance y
     double delta_rms;         // rms energy spread
-    double gamma;             // relativistic gamma
     double tol_co;            // tolerance for closed orbit
     double tol_disp;          // tolerance for normalized dispersion
     double tol_disp_ref_dx;   // tolerance for reference dispersion derivative
@@ -24,6 +28,7 @@ typedef struct beam_data
     double tol_energy;        // tolerance for energy error
     double tol_betabeating;   // tolerance for betabeating in sigma
 } G2DBeamData;
+
 
 typedef struct aperture_data
 {

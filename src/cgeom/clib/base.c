@@ -77,8 +77,7 @@ double geom2d_elliptic_E_complete(double k)
 void merge_sorted(const double *restrict a, const double *restrict b, int len_a, int len_b, double *out, int *out_len)
 /* Return array with not repeated ascending values from a and b that are assumed to be sorted
 
-Contract: len_a=len(a); len_b=len(b); len(out)=len_a+len_b;
-Post-Contract: len(out)=out_len;
+Contract: len_a=len(a); len_b=len(b); len(out)=len_a+len_b; postlen(out)=out_len;
 */
 {
     int ia = 0, ib = 0, k = 0;

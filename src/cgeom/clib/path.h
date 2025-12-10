@@ -72,6 +72,8 @@ int geom2d_path_get_len_steps(const G2DPath *path, double ds_min);
 double geom2d_path_get_length(const G2DPath *path);
 void geom2d_path_get_steps(const G2DPath *path, double ds_min, double *out_steps);
 void geom2d_path_get_points_at_steps(const G2DPath *path, const double *steps, int len_points, G2DPoint *out_points);
+int geom2d_path_get_len_points(const G2DPath *path);
+void geom2d_path_get_points(const G2DPath *path, G2DPoint *out_points);
 int geom2d_path_get_len_corners(const G2DPath *path);
 void geom2d_path_get_corner_steps(const G2DPath *path, double *out_steps);
 void geom2d_path_get_n_uniform_points(const G2DPath *path, int n_points, G2DPoint *out_points);

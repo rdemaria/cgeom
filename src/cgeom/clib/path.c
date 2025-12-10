@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <malloc/malloc.h>
 
 #include "base.h"
 #include "path.h"
@@ -14,6 +15,9 @@
 #ifndef M_PI_2
 #define M_PI_2 (0.5 * M_PI)
 #endif
+#ifndef POINTS_PER_ARC
+#define POINTS_PER_ARC 10
+#endif
 
 /*
 geom2d_<object>_<operation>....
@@ -21,7 +25,6 @@ geom2d_<object>_<operation>....
 */
 
 /* ===== Line segment functions ===== */
-
 void geom2d_line_segment_from_start_end(double x0, double y0, double x1, double y1, G2DSegment *out)
 /* Get line data from starting and ending points
 
@@ -685,9 +688,9 @@ int geom2d_path_get_len_points(const G2DPath *path)
         {
             total_points += 1;
         }
-        else if (path->segments[i].type == 1)
+        else if (path->segments[i].type == 1 || path->segments[i].type == 2)
         {
-            total_points += 10;
+            total_points += POINTS_PER_ARC;
         }
     }
     return total_points;
@@ -700,26 +703,52 @@ Contract: len(out_points)=geom2d_path_get_len_points(path)
 */
 {
     int idx = 0;
-    out_points[idx++].x = path->segments[0].data[0];
-    out_points[idx++].y = path->segments[0].data[1];
+    const double steps[] = {0.0};
+    switch (path->segments[0].type) {
+        case 0: /* line segment */
+            geom2d_line_segment_get_points_at_steps(&path->segments[0], steps, 1, &out_points[idx]);
+            break;
+        case 1: /* arc segment */
+            geom2d_arc_segment_get_points_at_steps(&path->segments[0], steps, 1, &out_points[idx]);
+            break;
+        case 2: /* ellipse arc */
+            geom2d_ellipse_segment_get_points_at_steps(&path->segments[0], steps, 1, &out_points[idx]);
+            break;
+    }
+    idx++;
+
     for (int i = 0; i < path->len_segments; i++)
     {
         if (path->segments[i].type == 0)
         {
-            geom2d_line_segment_get_points_at_steps(&path->segments[i], NULL, 1, &out_points[idx]);
+            const double seg_length = geom2d_line_segment_get_length(&path->segments[i]);
+            const double steps[] = {seg_length};
+            geom2d_line_segment_get_points_at_steps(&path->segments[i], steps, 1, &out_points[idx]);
             idx += 1;
         }
         else if (path->segments[i].type == 1)
         {
             double seg_length = geom2d_arc_segment_get_length(&path->segments[i]);
-            double ds = seg_length / 10.0;
-            double steps[10];
-            for (int j = 1; j <= 10; j++)
+            double ds = seg_length / POINTS_PER_ARC;
+            double steps[POINTS_PER_ARC];
+            for (int j = 1; j <= POINTS_PER_ARC; j++)
             {
                 steps[j - 1] = j * ds;
             }
-            geom2d_arc_segment_get_points_at_steps(&path->segments[i], steps, 10, &out_points[idx]);
-            idx += 10;
+            geom2d_arc_segment_get_points_at_steps(&path->segments[i], steps, POINTS_PER_ARC, &out_points[idx]);
+            idx += POINTS_PER_ARC;
+        }
+        else if (path->segments[i].type == 2)
+        {
+            double seg_length = geom2d_ellipse_segment_get_length(&path->segments[i]);
+            double ds = seg_length / POINTS_PER_ARC;
+            double steps[POINTS_PER_ARC];
+            for (int j = 1; j <= POINTS_PER_ARC; j++)
+            {
+                steps[j - 1] = j * ds;
+            }
+            geom2d_ellipse_segment_get_points_at_steps(&path->segments[i], steps, POINTS_PER_ARC, &out_points[idx]);
+            idx += POINTS_PER_ARC;
         }
     }
 }
@@ -749,7 +778,7 @@ void geom2d_path_get_corner_steps(const G2DPath *path, double *out_steps)
 
 void geom2d_path_get_n_uniform_points(const G2DPath *path, int n_points, G2DPoint *out_points)
 {
-double total_length = geom2d_path_get_length(path);
+    double total_length = geom2d_path_get_length(path);
     double ds = total_length / (n_points - 1);
     double *steps = (double *)malloc(n_points * sizeof(double));
     for (int i = 0; i < n_points; i++)

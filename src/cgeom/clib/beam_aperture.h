@@ -1,10 +1,10 @@
-#include "base.h"
-#include "path.h"
-
 #ifndef CGEOM_BEAM_APERTURE_H
 #define CGEOM_BEAM_APERTURE_H
 
-typedef struct twiss_data
+#include "base.h"
+#include "path.h"
+
+typedef struct
 {
     double x;     // closed orbit x
     double y;     // closed orbit y
@@ -16,8 +16,7 @@ typedef struct twiss_data
     double gamma; // relativistic gamma
 } G2DTwissData;
 
-typedef struct beam_data
-{
+typedef struct {
     double emitx_norm;        // normalized emittance x
     double emity_norm;        // normalized emittance y
     double delta_rms;         // rms energy spread
@@ -27,14 +26,13 @@ typedef struct beam_data
     double tol_disp_ref_beta; // tolerance for reference dispersion beta
     double tol_energy;        // tolerance for energy error
     double tol_betabeating;   // tolerance for betabeating in sigma
-    double halo_x ;           // n sigma of horizontal halo
-    double halo_y ;           // n sigma of vertical halo
-    double halo_r ;           // n sigma of 45 degree halo
+    double halo_x;            // n sigma of horizontal halo
+    double halo_y;            // n sigma of vertical halo
+    double halo_r;            // n sigma of 45 degree halo
     double halo_primary;      // n sigma of primary halo
 } G2DBeamData;
 
-typedef struct aperture_data
-{
+typedef struct {
     G2DPoint *points; // points defining the aperture shape
     int n_points;     // number of points defining the aperture shape
     double tol_r;     // radial tolerance for point-in-aperture check

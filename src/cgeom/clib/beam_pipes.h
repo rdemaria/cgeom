@@ -1,10 +1,8 @@
-#include "base.h"
-#include "path.h"
-
-
-
 #ifndef CGEOM_BEAM_PIPES_H
 #define CGEOM_BEAM_PIPES_H
+
+#include "base.h"
+#include "path.h"
 
 typedef struct profile
 {

@@ -112,8 +112,11 @@ class Path2D(clib.G2DPath):
         Returns:
             numpy.ndarray: Array of points along the path.
         """
-        steps = clib.geom2d_path_get_steps(self, ds_min)
-        return clib.geom2d_path_get_points_at_steps(self, steps)
+        if ds_min is not None:
+            steps = clib.geom2d_path_get_steps(self, ds_min)
+            return clib.geom2d_path_get_points_at_steps(self, steps)
+        else:
+            return clib.geom2d_path_get_points(self)
 
     def get_points_at_steps(self, steps):
         """Get points along the path at specified steps.

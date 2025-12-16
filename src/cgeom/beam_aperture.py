@@ -50,20 +50,99 @@ def transform_matrix(dx, dy, ds, theta, phi, psi):
 
 
 class Aperture:
-    def __init__(self, line):
+    def __init__(self, line, tol_x, tol_y, tol_r):
         self.line = line
         self._twiss = line.twiss()
+        self.beam_data = clib.G2DBeamData()
 
-        s_positions, twiss_data, apertures, types = self.build_aperture_data()
+        self.tol_x = tol_x
+        self.tol_y = tol_y
+        self.tol_r = tol_r
+
+        s_positions, twiss_data, apertures, types, name_to_index = self.build_aperture_data()
         self.s_positions = s_positions
         self.twiss_data = twiss_data
         self.apertures = apertures
         self.types = types
+        self._name_to_index = name_to_index
+
+    def set_beam_data(
+            self,
+            emitt_x_norm,
+            emitt_y_norm,
+            delta_rms,
+            tol_co,
+            tol_disp,
+            tol_disp_ref_dx,
+            tol_disp_ref_beta,
+            tol_energy,
+            tol_betabeating,
+            halo_x,
+            halo_y,
+            halo_r,
+            halo_primary,
+    ):
+        """Set beam attributes.
+
+        Parameters
+        ----------
+        emitt_x_norm: float
+            normalized emittance x
+        emitt_y_norm: float
+            normalized emittance y
+        delta_rms: float
+            rms energy spread
+        tol_co: float
+            tolerance for closed orbit
+        tol_disp: float
+            tolerance for normalized dispersion
+        tol_disp_ref_dx: float
+            tolerance for reference dispersion derivative
+        tol_disp_ref_beta: float
+            tolerance for reference dispersion beta
+        tol_energy: float
+            tolerance for energy error
+        tol_betabeating: float
+            tolerance for betabeating in sigma
+        halo_x: float
+            n sigma of horizontal halo
+        halo_y: float
+            n sigma of vertical halo
+        halo_r: float
+            n sigma of 45 degree halo
+        halo_primary: float
+            n sigma of primary halo
+        """
+        self.beam_data = clib.G2DBeamData(
+            emitx_norm=emitt_x_norm,
+            emity_norm=emitt_y_norm,
+            delta_rms=delta_rms,
+            tol_co=tol_co,
+            tol_disp=tol_disp,
+            tol_disp_ref_dx=tol_disp_ref_dx,
+            tol_disp_ref_beta=tol_disp_ref_beta,
+            tol_energy=tol_energy,
+            tol_betabeating=tol_betabeating,
+            halo_x=halo_x,
+            halo_y=halo_y,
+            halo_r=halo_r,
+            halo_primary=halo_primary,
+        )
+
+    def get_s(self, name):
+        return self.s_positions[self._name_to_index[name]]
+
+    def get_twiss(self, name):
+        return self.twiss_data[self._name_to_index[name]]
+
+    def get_aperture(self, name):
+        return self.apertures[self._name_to_index[name]]
 
     def build_aperture_data(self):
         line_table = self.line.get_table()
         s_positions, twiss_data, paths, types = [], [], [], []
         names = self.line.element_names
+        name_to_index = {}
 
         for idx, name in progress(enumerate(names), desc="Building aperture data", total=len(names)):
             element = self.line.element_dict[name]
@@ -75,12 +154,13 @@ class Aperture:
                 self.apply_transform(aperture, element)
             twiss = self.get_twiss_data_at_element(idx)
 
+            name_to_index[name] = len(s_positions)
             s_positions.append(line_table.s[idx])
             twiss_data.append(twiss)
             paths.append(aperture)
             types.append(type(element))
 
-        return s_positions, twiss_data, paths, types
+        return s_positions, twiss_data, paths, types, name_to_index
 
     def get_aperture_data_from_limit_element(self, name):
         """
@@ -101,9 +181,9 @@ class Aperture:
         beam_aperture = clib.G2DBeamApertureData(
             points=points,
             n_points=len(points),
-            tol_r=0,
-            tol_x=0,
-            tol_y=0,
+            tol_r=self.tol_r,
+            tol_x=self.tol_x,
+            tol_y=self.tol_y,
         )
         return beam_aperture
 

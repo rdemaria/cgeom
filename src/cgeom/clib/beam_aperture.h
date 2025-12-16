@@ -40,6 +40,7 @@ typedef struct {
     double tol_y;     // vertical tolerance for point-in-aperture check
 } G2DBeamApertureData;
 
+void geom2d_get_beam_envelope(const G2DBeamData *beam_data, const G2DTwissData *twiss_data, const G2DBeamApertureData *aperture_data, int len_points, G2DPoint *out_points);
 void generate_beam_envelope_from_sigma_xy(G2DBeamData *beam_data, G2DTwissData *twiss_data, G2DBeamApertureData *aperture_data, G2DSegment *segments, int n_segments);
 
 #endif // CGEOM_BEAM_APERTURE_H

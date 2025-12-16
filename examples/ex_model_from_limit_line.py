@@ -36,7 +36,7 @@ nemitt_y = 3e-6
 sigmas = 11
 tw = b1_with_aper.twiss4d()
 one_sigma_envelope_x = np.sqrt(tw.betx * nemitt_x / tw.gamma0)
-one_sigma_envelope_y = np.sqrt(tw.betx * nemitt_x / tw.gamma0)
+one_sigma_envelope_y = np.sqrt(tw.bety * nemitt_y / tw.gamma0)
 
 # Obtain extents
 extents = np.array(list(aperture_model.extents))

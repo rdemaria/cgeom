@@ -73,21 +73,6 @@ for name in section_to_plot.name:
     sig_x = this_row.one_sigma_envelope_x
     sig_y = this_row.one_sigma_envelope_y
 
-    # Plot the beam
-    # -------------
-
-
-    # beam = Path2D.from_ellipse(
-    #     rx=10 * sig_x,
-    #     ry=10 * sig_y,
-    # )
-    # ellipse_points = beam.get_points(ds_min=0.001)
-    # ellipse_points['x'] += this_row.x
-    # ellipse_points['y'] += this_row.y
-    # ax.plot(ellipse_points["x"], ellipse_points["y"])
-
-    # Plot the beam tol
-    # -----------------
     hr = aperture_model.beam_data.halo_r
     hx = aperture_model.beam_data.halo_x
     hy = aperture_model.beam_data.halo_y

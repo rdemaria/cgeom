@@ -28,7 +28,7 @@ class Path2D(clib.G2DPath):
         Returns:
             Path2D: The created elliptical path.
         """
-        segments= clib.geom2d_segments_from_ellipse(rx, ry)
+        segments = clib.geom2d_segments_from_ellipse(rx, ry)
         return cls(segments=segments, len_segments=len(segments))
 
     @classmethod
@@ -112,8 +112,11 @@ class Path2D(clib.G2DPath):
         Returns:
             numpy.ndarray: Array of points along the path.
         """
-        steps = clib.geom2d_path_get_steps(self, ds_min)
-        return clib.geom2d_path_get_points_at_steps(self, steps)
+        if ds_min is not None:
+            steps = clib.geom2d_path_get_steps(self, ds_min)
+            return clib.geom2d_path_get_points_at_steps(self, steps)
+        else:
+            return clib.geom2d_path_get_points(self)
 
     def get_points_at_steps(self, steps):
         """Get points along the path at specified steps.
@@ -146,16 +149,25 @@ class Path2D(clib.G2DPath):
         """Plot the path using Matplotlib.
 
         Parameters:
-            ax: Matplotlib Axes object. If None, uses the current axes.
-            **kwargs: Additional keyword arguments passed to the plot function.
+            ax: Matplotlib Axes
+                If None, uses the current axes.
+            ds_min: float | None
+                Minimum step size. If None, uses adaptive point distribution,
+                instead of uniform step size.
+            **kwargs: dict
+                Additional keyword arguments passed to the plot function.
         """
 
         if ax is None:
             ax = plt.gca()
             ax.set_aspect("equal")
 
-        steps = clib.geom2d_path_get_steps(self, ds_min)
-        points = clib.geom2d_path_get_points_at_steps(self, steps)
+        if ds_min is not None:
+            steps = clib.geom2d_path_get_steps(self, ds_min)
+            points = clib.geom2d_path_get_points_at_steps(self, steps)
+        else:
+            points = clib.geom2d_path_get_points(self)
+
         ax.plot(points["x"], points["y"], **kwargs)
         ax.set_xlabel("x")
         ax.set_ylabel("y")

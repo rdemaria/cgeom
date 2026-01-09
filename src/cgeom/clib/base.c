@@ -11,12 +11,44 @@ double geom2d_norm(double x, double y)
     return sqrt(x * x + y * y);
 }
 
+double geom2d_dot(G2DPoint a, G2DPoint b)
+{
+    return a.x*b.x + a.y*b.y;
+}
+
+double geom2d_cross(G2DPoint a, G2DPoint b)
+{
+    return a.x*b.y - a.y*b.x;
+}
+
+G2DPoint geom2d_sub(G2DPoint a, G2DPoint b)
+{
+    G2DPoint r = {a.x-b.x, a.y-b.y};
+    return r;
+}
+
+double geom2d_clamp(double t, double lo, double hi) {
+    return (t < lo) ? lo : (t > hi) ? hi : t;
+}
+
 double geom2d_points_distance(double x1, double y1, double x2, double y2)
 /* Get the distance between two 2D points */
 {
     double dx = x2 - x1;
     double dy = y2 - y1;
     return geom2d_norm(dx, dy);
+}
+
+void geom2d_points_translate(double dx, double dy, G2DPoint* points, const int len_points)
+/* Translate the `points` by (dx, dy)
+
+Contract: len_points=len(points)
+*/
+{
+    for (int i = 0; i < len_points; i++) {
+        points[i].x += dx;
+        points[i].y += dy;
+    }
 }
 
 static double geom2d_elliptic_E_adaptive(double a, double b, double eps, int depth, double m)

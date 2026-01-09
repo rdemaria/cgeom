@@ -25,7 +25,7 @@ typedef struct {
     double tol_disp_ref_dx;   // tolerance for reference dispersion derivative
     double tol_disp_ref_beta; // tolerance for reference dispersion beta
     double tol_energy;        // tolerance for energy error
-    double tol_betabeating;   // tolerance for betabeating in sigma
+    double tol_beta_beating;  // tolerance for beta beating in sigma
     double halo_x;            // n sigma of horizontal halo
     double halo_y;            // n sigma of vertical halo
     double halo_r;            // n sigma of 45 degree halo
@@ -42,5 +42,19 @@ typedef struct {
 
 void geom2d_get_beam_envelope(const G2DBeamData *beam_data, const G2DTwissData *twiss_data, const G2DBeamApertureData *aperture_data, int len_points, G2DPoint *out_points);
 void generate_beam_envelope_from_sigma_xy(G2DBeamData *beam_data, G2DTwissData *twiss_data, G2DBeamApertureData *aperture_data, G2DSegment *segments, int n_segments);
+
+char geom2d_is_point_inside_polygon(const G2DPoint* point, const G2DPoint* points, const int len_points);
+char geom2d_points_inside_polygon(const G2DPoint* points, const G2DPoint* poly_points, const int len_points, const int len_poly_points);
+
+double geom2d_compute_max_aperture_sigma_bisection(
+    G2DBeamData *beam_data,
+    const G2DTwissData *twiss_data,
+    const G2DBeamApertureData *aperture_data,
+    int len_points,
+    const double lower_bound,
+    const double upper_bound,
+    const double tol,
+    G2DPoint *out_points
+);
 
 #endif // CGEOM_BEAM_APERTURE_H

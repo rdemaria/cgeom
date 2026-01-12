@@ -1,28 +1,30 @@
+from oracledb import defaults
 import xobjects as xo
 
 
 class Circle(xo.Struct):
-    radius= xo.Float32
+    radius = xo.Float32
 
 
 class Rectangle(xo.Struct):
-    half_width= xo.Float32
-    half_height= xo.Float32
+    half_width = xo.Float32
+    half_height = xo.Float32
 
 
 class Ellipse(xo.Struct):
-    half_major= xo.Float32
-    half_minor= xo.Float32
+    half_major = xo.Float32
+    half_minor = xo.Float32
 
 
 class Octagon(xo.Struct):
-    half_width= xo.Float32
-    half_height= xo.Float32
-    half_diagonal= xo.Float32
+    half_width = xo.Float32
+    half_height = xo.Float32
+    half_diagonal = xo.Float32
 
 
 class Polygon(xo.Struct):
-    vertices= xo.Float32[:, 2]
+    vertices = xo.Float32[:, 2]
+
 
 class SVGShape(xo.Struct):
     svg_data = xo.String()
@@ -90,10 +92,36 @@ class ApertureModel:
 
 
 class Aperture:
-    def __init__(self, env, profiles, aperture_types, aperture_model, cross_sections):
+    halo_params = {
+        "emitx_norm": 3.5e-6,  # normalized emittance x
+        "emity_norm": 3.5e-6,  # normalized emittance y
+        "delta_rms": 0.0,  # rms energy spread
+        "tol_co": 0.0,  # tolerance for closed orbit
+        "tol_disp": 0.0,  # tolerance for normalized dispersion
+        "tol_disp_ref_dx": 1.8,  # tolerance for reference dispersion derivative
+        "tol_disp_ref_beta": 170,  # tolerance for reference dispersion beta
+        "tol_energy": 0.0,  # tolerance for energy error
+        "tol_beta_beating": 1.0,  # tolerance for beta beating in sigma
+        "halo_x": 6.0,  # n sigma of horizontal halo
+        "halo_y": 6.0,  # n sigma of vertical halo
+        "halo_r": 6.0,  # n sigma of 45 degree halo
+        "halo_primary": 6.0,  # n sigma of primary halo
+    }
+
+    def __init__(
+        self,
+        env,
+        profiles,
+        aperture_types,
+        aperture_model,
+        cross_sections,
+        halo_params=None,
+    ):
         self.env = env
         self.profiles = profiles  # list of profile objects
         self.aperture_types = aperture_types  # list of pipes in the lab frame
         self.aperture_model = aperture_model  # positioning of types in line frame
         self.cross_sections = cross_sections
-
+        self.halo_params = self.halo_params.copy()
+        if halo_params is not None:
+            self.halo_params.update(halo_params)
